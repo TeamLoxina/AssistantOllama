@@ -24,10 +24,9 @@ jobs:
 
       - name: Compiler l'APK
         run: |
-          # On cherche le dossier qui contient VRAIMENT le fichier settings
-          ROOT_DIR=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
-          echo "Le projet a ete trouve dans : $ROOT_DIR"
-          cd "$ROOT_DIR"
+          # On entre directement dans le dossier du projet
+          cd "Assistante Ollama"
+          # On lance la compilation
           gradle assembleDebug --stacktrace
 
       - name: Televerser l'APK
