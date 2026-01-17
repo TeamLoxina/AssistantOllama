@@ -22,13 +22,14 @@ jobs:
 
       - name: Compiler l'APK
         run: |
-          # On entre dans le double dossier
-          cd "Assistante Ollama/Assistante Ollama"
+          # On cherche le dossier qui contient build.gradle.kts
+          CHEMIN=$(find . -name "build.gradle.kts" -exec dirname {} \; | head -n 1)
+          echo "Le projet est dans : $CHEMIN"
+          cd "$CHEMIN"
           gradle assembleDebug
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: mon-application-ollama
-          # Le chemin vers l'APK final après la compilation
-          path: "**/build/outputs/apk/debug/*.apk"
+          name: mon-application-debug
+          path: "**/*.apk"
