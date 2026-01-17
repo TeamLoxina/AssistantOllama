@@ -20,14 +20,14 @@ jobs:
       - name: Installer Gradle
         run: sudo apt-get update && sudo apt-get install -y gradle
 
-      - name: Compiler l'APK
+      - name: Compiler l'APK (Mode Force)
         run: |
           # On cherche le dossier qui contient settings.gradle.kts
           CHEMIN=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
           cd "$CHEMIN"
           
-          # On lance la compilation globale sans nommer de projet spécifique
-          gradle assembleDebug
+          # On force Gradle à trouver les tâches et on compile
+          gradle clean assembleDebug --stacktrace
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
