@@ -24,14 +24,15 @@ jobs:
 
       - name: Compiler l'APK
         run: |
-          # Cette commande trouve le dossier contenant le projet Android et y lance la compilation
-          PROJET_DIR=$(find . -name "build.gradle.kts" -not -path "*/app/*" -exec dirname {} \;)
-          cd "$PROJET_DIR"
+          # On cherche le dossier qui contient VRAIMENT le fichier settings
+          ROOT_DIR=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
+          echo "Le projet a ete trouve dans : $ROOT_DIR"
+          cd "$ROOT_DIR"
           gradle assembleDebug --stacktrace
 
       - name: Televerser l'APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
-          # On utilise un chemin generique pour trouver l'APK partout dans le depot
           path: "**/build/outputs/apk/debug/*.apk"
