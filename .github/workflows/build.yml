@@ -16,26 +16,22 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
-      - name: Generer le Gradle Wrapper
-        # Cette etape installe Gradle sur le serveur GitHub juste pour creer le wrapper
-        working-directory: "./Assistante Ollama"
+      - name: Compiler avec Gradle (Auto-installation)
+        # On utilise une action officielle qui installe Gradle proprement
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.5
+
+      - name: Executer la compilation
+        # On lance la compilation directement dans le dossier du projet
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gradle
-          gradle wrapper --gradle-version 8.5
-
-      - name: Accorder les permissions d'execution
-        working-directory: "./Assistante Ollama"
-        run: chmod +x gradlew
-
-      - name: Compiler l'APK Debug
-        working-directory: "./Assistante Ollama"
-        run: ./gradlew assembleDebug --stacktrace
+          cd "Assistante Ollama"
+          gradle assembleDebug --stacktrace
 
       - name: Televerser l'APK
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
+          # Le chemin doit correspondre a votre structure d'images
           path: "Assistante Ollama/app/build/outputs/apk/debug/*.apk"
