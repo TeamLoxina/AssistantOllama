@@ -17,11 +17,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Compilation avec Gradle
-        # On dit à GitHub d'exécuter les commandes DANS le dossier de votre application
-        working-directory: "Assistante Ollama" 
+      - name: Compilation automatique
         run: |
-          # On utilise le wrapper gradle du projet (plus fiable)
+          # Cette commande trouve le fichier gradlew peu importe où il est caché
+          GRADLEW_PATH=$(find . -name gradlew | head -n 1)
+          
+          if [ -z "$GRADLEW_PATH" ]; then
+            echo "ERREUR : Fichier gradlew introuvable dans le dépôt !"
+            exit 1
+          fi
+          
+          # On se déplace dans le dossier contenant gradlew
+          cd $(dirname "$GRADLEW_PATH")
+          
+          # On lance la compilation
           chmod +x gradlew
           ./gradlew assembleDebug
 
@@ -29,6 +38,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
-          # On cherche l'APK partout dans le dépôt
           path: "**/*.apk"
           if-no-files-found: error
