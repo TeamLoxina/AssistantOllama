@@ -22,14 +22,16 @@ jobs:
 
       - name: Compiler l'APK
         run: |
-          # On cherche le dossier qui contient build.gradle.kts
-          CHEMIN=$(find . -name "build.gradle.kts" -exec dirname {} \; | head -n 1)
-          echo "Le projet est dans : $CHEMIN"
+          # 1. On trouve le dossier qui contient settings.gradle.kts
+          CHEMIN=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
           cd "$CHEMIN"
-          gradle assembleDebug
+          
+          # 2. On lance la compilation spécifiquement sur le module 'application'
+          # On utilise ':application:assembleDebug' car ton dossier s'appelle 'application'
+          gradle :application:assembleDebug
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: mon-application-debug
+          name: mon-application-ollama
           path: "**/*.apk"
