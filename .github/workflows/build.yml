@@ -1,14 +1,14 @@
-name: Generer APK
+name: Generateur APK
 
 on:
   workflow_dispatch:
 
 jobs:
-  construire:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Verifier le code
+      - name: Recuperer le code
         uses: actions/checkout@v4
 
       - name: Configurer JDK 17
@@ -16,33 +16,26 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: Reparateur et Compilateur
+      - name: Generer le Gradle Wrapper
+        # Cette etape installe Gradle sur le serveur GitHub juste pour creer le wrapper
+        working-directory: "./Assistante Ollama"
         run: |
-          # 1. Installation de Gradle
-          sudo apt-get update && sudo apt-get install -y gradle
-          
-          # 2. Trouver le dossier du projet
-          PROJET_PATH=$(find . -name "settings.gradle.kts" -exec dirname {} \;)
-          cd "$PROJET_PATH"
-          
-          # 3. REPARATION : On force l'ajout des dépôts Google dans settings.gradle.kts
-          # Sans cela, GitHub ne peut pas télécharger les outils Android
-          echo 'pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }' > temp_settings.kts
-          echo 'dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }' >> temp_settings.kts
-          cat settings.gradle.kts >> temp_settings.kts
-          mv temp_settings.kts settings.gradle.kts
-
-          # 4. On prépare le moteur de compilation
+          sudo apt-get update
+          sudo apt-get install -y gradle
           gradle wrapper --gradle-version 8.5
-          chmod +x gradlew
-          
-          # 5. On lance la compilation
-          ./gradlew assembleDebug --stacktrace
+
+      - name: Accorder les permissions d'execution
+        working-directory: "./Assistante Ollama"
+        run: chmod +x gradlew
+
+      - name: Compiler l'APK Debug
+        working-directory: "./Assistante Ollama"
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Televerser l'APK
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
-          path: "**/*.apk"
-          if-no-files-found: error
+          path: "Assistante Ollama/app/build/outputs/apk/debug/*.apk"
