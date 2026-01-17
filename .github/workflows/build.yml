@@ -18,9 +18,12 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Accorder les permissions et Compiler
+      - name: Trouver le dossier et compiler
         run: |
-          cd "Assistante Ollama"
+          # Cette ligne cherche automatiquement où se trouve le projet Android
+          DOSSIER_PROJET=$(find . -name "gradlew" -exec dirname {} \;)
+          echo "Le projet a été trouvé dans : $DOSSIER_PROJET"
+          cd "$DOSSIER_PROJET"
           chmod +x gradlew
           ./gradlew assembleDebug
 
@@ -28,4 +31,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: "Assistante Ollama/app/build/outputs/apk/debug/*.apk"
+          # On utilise un chemin générique pour trouver l'APK où qu'il soit
+          path: "**/*.apk"
