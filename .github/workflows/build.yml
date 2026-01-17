@@ -16,15 +16,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle' # Accélère les prochaines compilations
+          cache: 'gradle'
 
-      - name: Accorder les permissions d'exécution à gradlew
-        run: chmod +x gradlew
-        working-directory: "Assistante Ollama"
-
-      - name: Générer un APK Debug
-        run: ./gradlew assembleDebug
-        working-directory: "Assistante Ollama"
+      - name: Accorder les permissions et Compiler
+        run: |
+          cd "Assistante Ollama"
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Téléverser le fichier APK
         uses: actions/upload-artifact@v4
