@@ -20,18 +20,14 @@ jobs:
       - name: Installer Gradle
         run: sudo apt-get update && sudo apt-get install -y gradle
 
-      - name: Compilation Finale
+      - name: Compilation Forcée
         run: |
-          # 1. On trouve le dossier qui contient le fichier settings
-          CHEMIN_RACINE=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
-          cd "$CHEMIN_RACINE"
-          
-          # 2. On lance la compilation de TOUS les modules trouvés
-          # Cela évite l'erreur "Project application not found"
-          gradle assembleDebug --stacktrace
+          # On cherche TOUS les dossiers qui contiennent un fichier build.gradle.kts
+          # et on lance la compilation dans chacun d'eux.
+          find . -name "build.gradle.kts" -not -path "*/.*" -execdir gradle assembleDebug \;
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mon_Assistant_Ollama
+          name: Mon_APK_Ollama
           path: "**/*.apk"
