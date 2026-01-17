@@ -26,12 +26,18 @@ jobs:
           PROJET_PATH=$(find . -name "settings.gradle.kts" -exec dirname {} \;)
           cd "$PROJET_PATH"
           
-          # 3. Force la mise à jour du wrapper et des permissions
+          # 3. REPARATION : On force l'ajout des dépôts Google dans settings.gradle.kts
+          # Sans cela, GitHub ne peut pas télécharger les outils Android
+          echo 'pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }' > temp_settings.kts
+          echo 'dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }' >> temp_settings.kts
+          cat settings.gradle.kts >> temp_settings.kts
+          mv temp_settings.kts settings.gradle.kts
+
+          # 4. On prépare le moteur de compilation
           gradle wrapper --gradle-version 8.5
           chmod +x gradlew
           
-          # 4. Nettoyage et Compilation avec option pour ignorer les erreurs de plugins locales
-          # On ajoute --stacktrace pour voir exactement quel dépôt bloque si ça échoue
+          # 5. On lance la compilation
           ./gradlew assembleDebug --stacktrace
 
       - name: Televerser l'APK
