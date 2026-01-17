@@ -20,22 +20,18 @@ jobs:
       - name: Installer Gradle
         run: sudo apt-get update && sudo apt-get install -y gradle
 
-      - name: Compilation Totale
+      - name: Compilation Finale
         run: |
-          # On cherche le dossier qui contient VRAIMENT le fichier settings
-          CHEMIN_PROJET=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
-          echo "Le coeur du projet est ici : $CHEMIN_PROJET"
-          cd "$CHEMIN_PROJET"
+          # 1. On trouve le dossier qui contient le fichier settings
+          CHEMIN_RACINE=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
+          cd "$CHEMIN_RACINE"
           
-          # On cherche le dossier qui contient le code (application)
-          DOSSIER_APP=$(find . -name "build.gradle.kts" ! -path "./build.gradle.kts" -exec dirname {} \; | head -n 1)
-          echo "Le dossier de l'app est : $DOSSIER_APP"
-          
-          # On lance la compilation du module spécifique
-          gradle :application:assembleDebug --stacktrace
+          # 2. On lance la compilation de TOUS les modules trouvés
+          # Cela évite l'erreur "Project application not found"
+          gradle assembleDebug --stacktrace
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: APK_Assistant_Ollama
+          name: Mon_Assistant_Ollama
           path: "**/*.apk"
