@@ -20,17 +20,22 @@ jobs:
       - name: Installer Gradle
         run: sudo apt-get update && sudo apt-get install -y gradle
 
-      - name: Compiler l'APK (Mode Force)
+      - name: Compilation Totale
         run: |
-          # On cherche le dossier qui contient settings.gradle.kts
-          CHEMIN=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
-          cd "$CHEMIN"
+          # On cherche le dossier qui contient VRAIMENT le fichier settings
+          CHEMIN_PROJET=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
+          echo "Le coeur du projet est ici : $CHEMIN_PROJET"
+          cd "$CHEMIN_PROJET"
           
-          # On force Gradle à trouver les tâches et on compile
-          gradle clean assembleDebug --stacktrace
+          # On cherche le dossier qui contient le code (application)
+          DOSSIER_APP=$(find . -name "build.gradle.kts" ! -path "./build.gradle.kts" -exec dirname {} \; | head -n 1)
+          echo "Le dossier de l'app est : $DOSSIER_APP"
+          
+          # On lance la compilation du module spécifique
+          gradle :application:assembleDebug --stacktrace
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: mon-application-ollama
+          name: APK_Assistant_Ollama
           path: "**/*.apk"
