@@ -19,17 +19,16 @@ jobs:
 
       - name: Reparateur et Compilateur
         run: |
-          # 1. On installe Gradle sur la machine
+          # 1. On installe Gradle
           sudo apt-get update && sudo apt-get install -y gradle
           
-          # 2. MAGIE : On cherche le dossier qui contient 'settings.gradle.kts'
-          # Cela évite les erreurs de nom de dossier
+          # 2. On trouve le dossier du projet
           PROJET_PATH=$(find . -name "settings.gradle.kts" -exec dirname {} \;)
-          echo "Dossier trouvé : $PROJET_PATH"
           cd "$PROJET_PATH"
           
-          # 3. On crée le fichier de commande manquant
-          gradle wrapper
+          # 3. On génère le wrapper avec une version RECENTE (8.5)
+          # C'est l'étape qui corrige l'erreur sur Java 17
+          gradle wrapper --gradle-version 8.5
           chmod +x gradlew
           
           # 4. On lance la compilation
