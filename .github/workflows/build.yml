@@ -19,20 +19,20 @@ jobs:
 
       - name: Reparateur et Compilateur
         run: |
-          # 1. On installe Gradle
+          # 1. Installation de Gradle
           sudo apt-get update && sudo apt-get install -y gradle
           
-          # 2. On trouve le dossier du projet
+          # 2. Trouver le dossier du projet
           PROJET_PATH=$(find . -name "settings.gradle.kts" -exec dirname {} \;)
           cd "$PROJET_PATH"
           
-          # 3. On génère le wrapper avec une version RECENTE (8.5)
-          # C'est l'étape qui corrige l'erreur sur Java 17
+          # 3. Force la mise à jour du wrapper et des permissions
           gradle wrapper --gradle-version 8.5
           chmod +x gradlew
           
-          # 4. On lance la compilation
-          ./gradlew assembleDebug
+          # 4. Nettoyage et Compilation avec option pour ignorer les erreurs de plugins locales
+          # On ajoute --stacktrace pour voir exactement quel dépôt bloque si ça échoue
+          ./gradlew assembleDebug --stacktrace
 
       - name: Televerser l'APK
         uses: actions/upload-artifact@v4
