@@ -17,21 +17,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Compilation automatique
+      - name: Reparer et Compiler
         run: |
-          # Cette commande trouve le fichier gradlew peu importe où il est caché
-          GRADLEW_PATH=$(find . -name gradlew | head -n 1)
+          # 1. On installe Gradle sur la machine GitHub
+          sudo apt-get update && sudo apt-get install -y gradle
           
-          if [ -z "$GRADLEW_PATH" ]; then
-            echo "ERREUR : Fichier gradlew introuvable dans le dépôt !"
-            exit 1
-          fi
+          # 2. On entre dans le dossier où se trouve votre projet
+          # D'après vos photos, c'est : Assistante Ollama/AssistantOllama
+          cd "Assistante Ollama/AssistantOllama"
           
-          # On se déplace dans le dossier contenant gradlew
-          cd $(dirname "$GRADLEW_PATH")
-          
-          # On lance la compilation
+          # 3. On génère le fichier gradlew manquant
+          gradle wrapper
           chmod +x gradlew
+          
+          # 4. On lance la compilation de l'APK
           ./gradlew assembleDebug
 
       - name: Televerser l'APK
