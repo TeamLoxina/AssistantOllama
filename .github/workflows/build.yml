@@ -4,27 +4,30 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  construire:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Vérifier le code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Configurer JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: 17
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle' # Accélère les prochaines compilations
 
-      - name: Install Gradle
-        run: sudo apt-get update && sudo apt-get install -y gradle
+      - name: Accorder les permissions d'exécution à gradlew
+        run: chmod +x gradlew
+        working-directory: "Assistante Ollama"
 
-      - name: Build APK
-        run: gradle assembleDebug
+      - name: Générer un APK Debug
+        run: ./gradlew assembleDebug
+        working-directory: "Assistante Ollama"
 
-      - name: Upload APK
+      - name: Téléverser le fichier APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: "Assistante Ollama/app/build/outputs/apk/debug/*.apk"
