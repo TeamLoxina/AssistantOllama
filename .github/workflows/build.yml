@@ -35,9 +35,9 @@ jobs:
           # 4. On vérifie visuellement dans les logs si le fichier est là
           ls -lh mon_apk_final/
 
-      - name: Téléverser l'APK
+      - nom: Téléverser l'APK
         uses: actions/upload-artifact@v4
-        with:
-          name: Mon_Assistant_Ollama
-          # On donne le chemin du dossier qu'on vient de remplir
-          path: mon_apk_final/
+        avec:
+          nom: Mon_Assistant_Ollama
+          path: "**/*.apk" # Cherche tous les fichiers .apk partout dans le projet
+          if-no-files-found: error # Force l'erreur si rien n'est trouvé pour savoir pourquoi
