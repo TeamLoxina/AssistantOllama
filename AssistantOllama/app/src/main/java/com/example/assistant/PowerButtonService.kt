@@ -2,12 +2,18 @@ package com.example.assistant
 
 import android.accessibilityservice.AccessibilityService
 import android.view.KeyEvent
+import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 
 class PowerButtonService : AccessibilityService() {
 
     private var lastPressTime: Long = 0
     private val doublePressThreshold = 500L
+
+    // Cette fonction est OBLIGATOIRE pour compiler un AccessibilityService
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        // Laisser vide si non utilisé
+    }
 
     override fun onKeyEvent(event: KeyEvent?): Boolean {
         if (event?.keyCode == KeyEvent.KEYCODE_POWER && event.action == KeyEvent.ACTION_DOWN) {
@@ -27,5 +33,7 @@ class PowerButtonService : AccessibilityService() {
         Toast.makeText(this, "Service PowerButton activé", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onInterrupt() {}
+    override fun onInterrupt() {
+        // Déjà présent, obligatoire aussi
+    }
 }
