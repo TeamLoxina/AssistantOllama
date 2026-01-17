@@ -22,12 +22,16 @@ jobs:
 
       - name: Compilation Forcée
         run: |
-          # On cherche TOUS les dossiers qui contiennent un fichier build.gradle.kts
-          # et on lance la compilation dans chacun d'eux.
+          # On compile
           find . -name "build.gradle.kts" -not -path "*/.*" -execdir gradle assembleDebug \;
+          
+          # ETAPE CRUCIALE : On crée un dossier 'sortie' et on y déplace l'APK trouvé
+          mkdir -p sortie_apk
+          find . -name "*.apk" -exec cp {} sortie_apk/ \;
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mon_APK_Ollama
-          path: "**/*.apk"
+          name: Mon_Assistant_Ollama
+          # On pointe directement sur notre nouveau dossier
+          path: sortie_apk/*.apk
