@@ -17,28 +17,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Installer Gradle
-        run: sudo apt-get update && sudo apt-get install -y gradle
-
-      - name: Compilation et Extraction
+      - name: Installation de Gradle et Compilation
         run: |
-          # 1. On cherche le fichier build.gradle et on lance la compilation
-          # On utilise find pour supporter les sous-dossiers si nécessaire
-          find . -name "build.gradle*" -not -path "*/.*" -execdir gradle assembleDebug \;
-          
-          # 2. Création du dossier final
-          mkdir -p mon_apk_final
-          
-          # 3. Copie de TOUS les APK trouvés vers le dossier final
-          find . -name "*.apk" -exec cp {} mon_apk_final/ \;
-          
-          # 4. Vérification visuelle dans les logs
-          ls -lh mon_apk_final/
+          sudo apt-get update && sudo apt-get install -y gradle
+          # On cherche tous les fichiers build.gradle et on lance la compilation dans leur dossier
+          find . -name "build.gradle*" -execdir gradle assembleDebug \;
 
       - name: Televerser l'APK
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
-          # On utilise un chemin large pour être sûr de ne rien rater
-          path: "mon_apk_final/*.apk"
+          # Cette ligne est la plus importante : elle cherche n'importe quel APK 
+          # généré dans tout le projet, peu importe le dossier.
+          path: "**/*.apk"
           if-no-files-found: error
