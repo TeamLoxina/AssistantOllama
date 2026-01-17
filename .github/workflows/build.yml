@@ -17,21 +17,21 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Compiler avec Gradle (Auto-installation)
-        # On utilise une action officielle qui installe Gradle proprement
+      - name: Configurer Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
 
-      - name: Executer la compilation
-        # On lance la compilation directement dans le dossier du projet
+      - name: Compiler l'APK
         run: |
-          cd "Assistante Ollama"
+          # Cette commande trouve le dossier contenant le projet Android et y lance la compilation
+          PROJET_DIR=$(find . -name "build.gradle.kts" -not -path "*/app/*" -exec dirname {} \;)
+          cd "$PROJET_DIR"
           gradle assembleDebug --stacktrace
 
       - name: Televerser l'APK
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
-          # Le chemin doit correspondre a votre structure d'images
-          path: "Assistante Ollama/app/build/outputs/apk/debug/*.apk"
+          # On utilise un chemin generique pour trouver l'APK partout dans le depot
+          path: "**/build/outputs/apk/debug/*.apk"
