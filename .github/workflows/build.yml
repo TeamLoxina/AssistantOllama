@@ -22,13 +22,12 @@ jobs:
 
       - name: Compiler l'APK
         run: |
-          # 1. On trouve le dossier qui contient settings.gradle.kts
+          # On cherche le dossier qui contient settings.gradle.kts
           CHEMIN=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
           cd "$CHEMIN"
           
-          # 2. On lance la compilation spécifiquement sur le module 'application'
-          # On utilise ':application:assembleDebug' car ton dossier s'appelle 'application'
-          gradle :application:assembleDebug
+          # On lance la compilation globale sans nommer de projet spécifique
+          gradle assembleDebug
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
