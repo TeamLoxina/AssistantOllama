@@ -17,17 +17,18 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Installation de Gradle et Compilation
+      - name: Compilation avec Gradle
+        # On dit à GitHub d'exécuter les commandes DANS le dossier de votre application
+        working-directory: "Assistante Ollama" 
         run: |
-          sudo apt-get update && sudo apt-get install -y gradle
-          # On cherche tous les fichiers build.gradle et on lance la compilation dans leur dossier
-          find . -name "build.gradle*" -execdir gradle assembleDebug \;
+          # On utilise le wrapper gradle du projet (plus fiable)
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Televerser l'APK
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
-          # Cette ligne est la plus importante : elle cherche n'importe quel APK 
-          # généré dans tout le projet, peu importe le dossier.
+          # On cherche l'APK partout dans le dépôt
           path: "**/*.apk"
           if-no-files-found: error
