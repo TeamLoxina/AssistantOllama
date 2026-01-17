@@ -16,20 +16,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
-      - name: Trouver le dossier et compiler
+      - name: Installer Gradle
+        run: sudo apt-get update && sudo apt-get install -y gradle
+
+      - name: Compiler l'APK
         run: |
-          # Cette ligne cherche automatiquement où se trouve le projet Android
-          DOSSIER_PROJET=$(find . -name "gradlew" -exec dirname {} \;)
-          echo "Le projet a été trouvé dans : $DOSSIER_PROJET"
-          cd "$DOSSIER_PROJET"
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          cd "Assistante Ollama"
+          gradle assembleDebug
 
-      - name: Téléverser le fichier APK
+      - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          # On utilise un chemin générique pour trouver l'APK où qu'il soit
-          path: "**/*.apk"
+          name: mon-application-ollama
+          path: "Assistante Ollama/application/build/outputs/apk/debug/*.apk"
