@@ -1,42 +1,20 @@
-package com.example.assistant
-
-import android.os.Bundle
-import android.widget.TextView
-import android.speech.tts.TextToSpeech
-import androidx.appcompat.app.AppCompatActivity
-import java.util.Locale
-
-class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
-
-    private lateinit var tts: TextToSpeech
-    private lateinit var responseText: TextView
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        responseText = findViewById(R.id.responseText)
-        tts = TextToSpeech(this, this)
+        val response = findViewById<TextView>(R.id.responseText)
+        val input = findViewById<EditText>(R.id.inputText)
 
-        AudioService.start(this)
-    }
-
-    fun showResponse(text: String) {
-        runOnUiThread {
-            responseText.text = text
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "1")
+        findViewById<Button>(R.id.sendText).setOnClickListener {
+            ApiClient.sendText(input.text.toString()) {
+                runOnUiThread { response.text = it }
+            }
         }
-    }
 
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            tts.language = Locale.FRENCH
+        findViewById<Button>(R.id.micButton).setOnClickListener {
+            startService(Intent(this, RecorderService::class.java))
         }
-    }
-
-    override fun onDestroy() {
-        tts.stop()
-        tts.shutdown()
-        super.onDestroy()
     }
 }
