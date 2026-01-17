@@ -20,18 +20,23 @@ jobs:
       - name: Installer Gradle
         run: sudo apt-get update && sudo apt-get install -y gradle
 
-      - name: Compilation Forcée
+      - name: Compilation et Capture
         run: |
-          # On compile
+          # 1. On compile partout où on trouve un projet
           find . -name "build.gradle.kts" -not -path "*/.*" -execdir gradle assembleDebug \;
           
-          # ETAPE CRUCIALE : On crée un dossier 'sortie' et on y déplace l'APK trouvé
-          mkdir -p sortie_apk
-          find . -name "*.apk" -exec cp {} sortie_apk/ \;
+          # 2. On crée un dossier de sortie à la RACINE absolue du projet
+          mkdir -p $GITHUB_WORKSPACE/output_apk
+          
+          # 3. On cherche tous les .apk et on les COPIE de force dans ce dossier
+          find . -name "*.apk" -exec cp {} $GITHUB_WORKSPACE/output_apk/ \;
+          
+          # 4. Debug : On vérifie si le dossier contient bien quelque chose
+          ls -R $GITHUB_WORKSPACE/output_apk/
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mon_Assistant_Ollama
-          # On pointe directement sur notre nouveau dossier
-          path: sortie_apk/*.apk
+          name: Mon_Assistant_APK
+          path: output_apk/
+          if-no-files-found: error
