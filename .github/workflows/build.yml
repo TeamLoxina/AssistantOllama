@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Recuperer le code
         uses: actions/checkout@v4
@@ -24,12 +23,9 @@ jobs:
 
       - name: Compiler l'APK
         run: |
-          # Trouve dynamiquement le dossier racine du projet
           PROJET_PATH=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
           cd "$PROJET_PATH"
-          
-          # Lancement de la compilation
-          gradle assembleDebug --stacktrace
+          gradle assembleDebug --stacktrace --info
 
       - name: Televerser l'APK
         if: success()
