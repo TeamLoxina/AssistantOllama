@@ -17,20 +17,22 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Reparer et Compiler
+      - name: Reparateur et Compilateur
         run: |
-          # 1. On installe Gradle sur la machine GitHub
+          # 1. On installe Gradle sur la machine
           sudo apt-get update && sudo apt-get install -y gradle
           
-          # 2. On entre dans le dossier où se trouve votre projet
-          # D'après vos photos, c'est : Assistante Ollama/AssistantOllama
-          cd "Assistante Ollama/AssistantOllama"
+          # 2. MAGIE : On cherche le dossier qui contient 'settings.gradle.kts'
+          # Cela évite les erreurs de nom de dossier
+          PROJET_PATH=$(find . -name "settings.gradle.kts" -exec dirname {} \;)
+          echo "Dossier trouvé : $PROJET_PATH"
+          cd "$PROJET_PATH"
           
-          # 3. On génère le fichier gradlew manquant
+          # 3. On crée le fichier de commande manquant
           gradle wrapper
           chmod +x gradlew
           
-          # 4. On lance la compilation de l'APK
+          # 4. On lance la compilation
           ./gradlew assembleDebug
 
       - name: Televerser l'APK
