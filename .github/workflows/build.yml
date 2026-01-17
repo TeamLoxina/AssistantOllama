@@ -1,7 +1,7 @@
 name: Generateur APK
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Permet de lancer la compilation manuellement
 
 jobs:
   build:
@@ -18,15 +18,21 @@ jobs:
           java-version: '17'
 
       - name: Configurer Gradle
+        # Cette action installe Gradle automatiquement
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
 
       - name: Compiler l'APK
         run: |
-          # On entre directement dans le dossier du projet
-          cd "Assistante Ollama"
-          # On lance la compilation
+          # 1. On cherche dynamiquement le dossier qui contient le fichier settings
+          PROJET_PATH=$(find . -name "settings.gradle.kts" -exec dirname {} \; | head -n 1)
+          echo "Projet trouve dans le dossier : $PROJET_PATH"
+          
+          # 2. On entre dans ce dossier
+          cd "$PROJET_PATH"
+          
+          # 3. On lance la compilation avec Gradle
           gradle assembleDebug --stacktrace
 
       - name: Televerser l'APK
@@ -34,4 +40,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Mon_Assistant_Ollama
+          # Cherche tous les fichiers .apk generes recursivement
           path: "**/build/outputs/apk/debug/*.apk"
