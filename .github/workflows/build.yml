@@ -22,11 +22,13 @@ jobs:
 
       - name: Compiler l'APK
         run: |
-          cd "Assistante Ollama"
+          # On entre dans le double dossier
+          cd "Assistante Ollama/Assistante Ollama"
           gradle assembleDebug
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
           name: mon-application-ollama
-          path: "Assistante Ollama/application/build/outputs/apk/debug/*.apk"
+          # Le chemin vers l'APK final après la compilation
+          path: "**/build/outputs/apk/debug/*.apk"
