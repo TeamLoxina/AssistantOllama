@@ -4,6 +4,8 @@ import android.content.Context
 import android.media.MediaRecorder
 import kotlinx.coroutines.*
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.IOException
 
@@ -13,7 +15,7 @@ object AudioService {
     private var audioFile: File? = null
 
     private val client = OkHttpClient()
-    private const val SERVER_URL = "http://IP_DE_TON_PC:8000/upload_audio" // Remplace par ton IP locale
+    private const val SERVER_URL = "http://IP_DE_TON_PC:8000/upload_audio" 
 
     fun start(context: Context) {}
 
@@ -38,13 +40,12 @@ object AudioService {
     }
 
     private fun sendAudio(context: Context) {
+        // Correction de la syntaxe RequestBody (Ligne 46)
+        val audioBody = audioFile!!.asRequestBody("audio/wav".toMediaTypeOrNull())
+        
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart(
-                "file",
-                "audio.wav",
-                RequestBody.create(MediaType.parse("audio/wav"), audioFile!!)
-            )
+            .addFormDataPart("file", "audio.wav", audioBody)
             .build()
 
         val request = Request.Builder()
@@ -55,9 +56,16 @@ object AudioService {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) { e.printStackTrace() }
             override fun onResponse(call: Call, response: Response) {
-                val json = response.body()?.string()
-                val answer = json?.split(""answer":"")?.getOrNull(1)?.split(""")?.get(0) ?: "Erreur"
-                (context as MainActivity).showResponse(answer)
+                // Correction : body() est devenu une propriété body (Ligne 58)
+                val json = response.body?.string()
+                
+                // Correction : Utilisation de guillemets simples pour entourer les guillemets doubles (Ligne 59)
+                val answer = json?.split("\"answer\":\"")?.getOrNull(1)?.split("\"")?.get(0) ?: "Erreur"
+                
+                // Note : Assurez-vous que MainActivity possède bien cette fonction
+                (context as? MainActivity)?.runOnUiThread {
+                    (context as? MainActivity)?.showResponse(answer)
+                }
             }
         })
     }
