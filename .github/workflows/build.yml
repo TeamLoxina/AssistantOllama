@@ -20,23 +20,24 @@ jobs:
       - name: Installer Gradle
         run: sudo apt-get update && sudo apt-get install -y gradle
 
-      - name: Compilation et Capture
+      - name: Compilation et Extraction
         run: |
-          # 1. On compile partout où on trouve un projet
+          # 1. On lance la compilation
           find . -name "build.gradle.kts" -not -path "*/.*" -execdir gradle assembleDebug \;
           
-          # 2. On crée un dossier de sortie à la RACINE absolue du projet
-          mkdir -p $GITHUB_WORKSPACE/output_apk
+          # 2. On crée un dossier 'final' à la racine
+          mkdir -p mon_apk_final
           
-          # 3. On cherche tous les .apk et on les COPIE de force dans ce dossier
-          find . -name "*.apk" -exec cp {} $GITHUB_WORKSPACE/output_apk/ \;
+          # 3. On cherche tous les APK créés et on les copie dans ce dossier
+          # On utilise -f pour forcer si besoin
+          find . -name "*.apk" -exec cp -v {} mon_apk_final/ \;
           
-          # 4. Debug : On vérifie si le dossier contient bien quelque chose
-          ls -R $GITHUB_WORKSPACE/output_apk/
+          # 4. On vérifie visuellement dans les logs si le fichier est là
+          ls -lh mon_apk_final/
 
       - name: Téléverser l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mon_Assistant_APK
-          path: output_apk/
-          if-no-files-found: error
+          name: Mon_Assistant_Ollama
+          # On donne le chemin du dossier qu'on vient de remplir
+          path: mon_apk_final/
