@@ -1,4 +1,4 @@
-name: Générer APK
+name: Generer APK
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Vérifier le code
+      - name: Verifier le code
         uses: actions/checkout@v4
 
       - name: Configurer JDK 17
@@ -22,22 +22,23 @@ jobs:
 
       - name: Compilation et Extraction
         run: |
-          # 1. On lance la compilation
-          find . -name "build.gradle.kts" -not -path "*/.*" -execdir gradle assembleDebug \;
+          # 1. On cherche le fichier build.gradle et on lance la compilation
+          # On utilise find pour supporter les sous-dossiers si nécessaire
+          find . -name "build.gradle*" -not -path "*/.*" -execdir gradle assembleDebug \;
           
-          # 2. On crée un dossier 'final' à la racine
+          # 2. Création du dossier final
           mkdir -p mon_apk_final
           
-          # 3. On cherche tous les APK créés et on les copie dans ce dossier
-          # On utilise -f pour forcer si besoin
-          find . -name "*.apk" -exec cp -v {} mon_apk_final/ \;
+          # 3. Copie de TOUS les APK trouvés vers le dossier final
+          find . -name "*.apk" -exec cp {} mon_apk_final/ \;
           
-          # 4. On vérifie visuellement dans les logs si le fichier est là
+          # 4. Vérification visuelle dans les logs
           ls -lh mon_apk_final/
 
-      - nom: Téléverser l'APK
+      - name: Televerser l'APK
         uses: actions/upload-artifact@v4
-        avec:
-          nom: Mon_Assistant_Ollama
-          path: "**/*.apk" # Cherche tous les fichiers .apk partout dans le projet
-          if-no-files-found: error # Force l'erreur si rien n'est trouvé pour savoir pourquoi
+        with:
+          name: Mon_Assistant_Ollama
+          # On utilise un chemin large pour être sûr de ne rien rater
+          path: "mon_apk_final/*.apk"
+          if-no-files-found: error
